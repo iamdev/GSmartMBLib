@@ -173,7 +173,7 @@ uint8_t GSmartMB::digitalState(uint8_t state){
 uint16_t GSmartMB::digitalRead(uint8_t pin){
   uint32_t ret;
   sendCommand(EXP_CMD_DIGITAL_READ,pin,&ret);
-  return ret;
+  return ret?0:1;
 }
 
 uint32_t GSmartMB::pwmFrequency(uint8_t pin,uint32_t freq){

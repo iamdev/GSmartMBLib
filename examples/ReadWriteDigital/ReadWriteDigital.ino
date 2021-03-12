@@ -1,43 +1,31 @@
+//Example : Invert logic D0 and D1
+
 #include <GSmartMBLib.h>
 GSmartMB mb;
 #define DHT_PIN D0
 float temp;
 float humi;
 int readTemperature();
+void taskCheckInput();
 void setup() {
   Serial.begin(115200);
   Serial.print("\nInitializing...");
-  mb.begin(true);  
-  Serial.println("Done.");    
+  mb.begin(true);
+  Serial.println("Done.");
+  mb.pinMode(0,DIGITAL_IO_MODE_INPUT);
+  mb.pinMode(1,DIGITAL_IO_MODE_OUTPUT);
+  Task.create(taskCheckInput,10);
 }
-void loop() {
-  if(readTemperature()){
-      Serial.printf("Temperature : %.2f°C, Humidity: %.1f%\n",temp,humi);
+
+void loop() { 
+  Task.loop();  
+}
+
+void taskCheckInput(){
+  static int _state = 0;
+  int state = mb.digitalRead(0);
+  if(state!=_state){
+    _state = state;
+    mb.digitalWrite(1, state?0:1);
   }
-  delay(1000);
 }
-
-
-
-uint32_t wait_signal(int pin,int signal,uint32_t timeout){
-  uint32_t us = micros();  
-  delayMicroseconds(5);
-  while(micros()<(us+timeout) && digitalRead(signal) != signal) delayMicroseconds(5);
-  return micros()-us;
-}
-
-int readTemperature(){
-  byte data[5];
-  pinMode(DHT_PIN,OUTPUT);  
-  digitalWrite(DHT_PIN,LOW);
-  delayMicroseconds(500);
-  digitalWrite(DHT_PIN,HIGH);
-  delayMicroseconds(5);
-  pinMode(DHT_PIN, INPUT_PULLUP);
-  uint32_t us = wait_signal(DHT_PIN, HIGH, 100);
-  if(us<80){
-    Serial.printf("Response signal in %u us.\n",us);
-  }
-  return 0;
-}
-
