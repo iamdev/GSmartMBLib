@@ -2,11 +2,6 @@
 
 #include <GSmartMBLib.h>
 GSmartMB mb;
-#define DHT_PIN D0
-float temp;
-float humi;
-int readTemperature();
-void taskCheckInput();
 void setup() {
   Serial.begin(115200);
   Serial.print("\nInitializing...");
